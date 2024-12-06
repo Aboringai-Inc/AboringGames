@@ -2,6 +2,8 @@
 
 AboringGames is where you can play games and make games with python.
 
+Can be only used in MacOS linux.
+
 Todo:
 
 - [x] add the main file(main.py)
