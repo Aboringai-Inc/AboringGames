@@ -1,13 +1,11 @@
-import os
-import sys
+# Copyright 2024 Aboringai Inc. All Rughts Reserved.
+
+import os, random, time
 
 def nextline(times) -> str: return "\n"*times
 
-print("AboringGames 1.0")
+print("AboringGames 1.8")
 print(nextline(2))
-
-import random
-import time
 
 # Game 1: Guess the Number
 def guess_the_number():
@@ -184,13 +182,16 @@ def main():
         10: math_challenge,
     }
     while True:
-        print("\nChoose a game to play (or -1 to make own game):")
+        print("\nChoose a game to play (or -1 to make own game or -2 to run game):")
         for i in range(1, 11):
             print(f"{i}: {games[i].__name__.replace('_', ' ').title()}")
         print("0: Exit")
         choice = int(input("Enter your choice: "))
         if choice == 0:
             break
+        if choice == -2:
+            choice4 = input("name for the file: ")
+            os.system(f"python user_game_{choice4}.py")
         if choice == -1:
             choice2 = input("what name will the file be? ")
             os.system(f"nano user_game_{choice2}.py")
@@ -204,4 +205,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
