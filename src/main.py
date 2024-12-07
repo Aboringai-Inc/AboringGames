@@ -1,10 +1,14 @@
 # Copyright 2024 Aboringai Inc. All Rughts Reserved.
 
-import os, random, time
+import os, random, time, sys
+
+TAB = "    "
+EDITOR = "vim" if sys.platform == "win32" else "nano"
+USE_PYTHON = "python" if sys.platform == "win32" else "python3"
 
 def nextline(times) -> str: return "\n"*times
 
-print("AboringGames 1.8")
+print("AboringGames 2.1")
 print(nextline(2))
 
 # Game 1: Guess the Number
@@ -167,7 +171,33 @@ def math_challenge():
             print(f"Wrong! The correct answer was: {num1 * num2}")
     print(f"Your final score: {score}/5")
 
-# Menu to play games
+def add_quit_logic(file_name):
+    """Append quit logic to user-created files intelligently."""
+    quit_code_loop = (
+        f"\n{TAB}choice = input('Press q to quit: ')\n"
+        f"{TAB}if choice.lower() == 'q':\n"
+        f"{TAB*2}break\n"
+    )
+    quit_code_no_loop = (
+        f"\nchoice = input('Press q to quit: ')\n"
+        f"if choice.lower() == 'q':\n"
+        f"{TAB}import sys\n"
+        f"{TAB}sys.exit(0)\n"
+    )
+
+    try:
+        with open(file_name, "r") as f:
+            content = f.read()
+        
+        with open(file_name, "a") as f:
+            if "while" in content or "for" in content:
+                f.write(quit_code_loop)
+            else:
+                f.write(quit_code_no_loop)
+    except Exception as e:
+        print(f"Error adding quit logic to {file_name}: {e}")
+
+
 def main():
     games = {
         1: guess_the_number,
@@ -181,24 +211,36 @@ def main():
         9: coin_toss,
         10: math_challenge,
     }
+
     while True:
         print("\nChoose a game to play (or -1 to make own game or -2 to run game):")
         for i in range(1, 11):
             print(f"{i}: {games[i].__name__.replace('_', ' ').title()}")
         print("0: Exit")
-        choice = int(input("Enter your choice: "))
+        
+        try:
+            choice = int(input("Enter your choice: "))
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+            continue
+
+        if choice < -3 or choice > 11:
+            print(f"AboringError: Invalid number: \"{choice}\"")
+            continue
+
         if choice == 0:
             break
-        if choice == -2:
-            choice4 = input("name for the file: ")
-            os.system(f"python user_game_{choice4}.py")
-        if choice == -1:
-            choice2 = input("what name will the file be? ")
-            os.system(f"nano user_game_{choice2}.py")
-            choice3 = input("run game? (y/n): ")
-            if choice3 == "y":
-                os.system(f"python user_game_{choice2}.py")
-        if choice in games:
+        elif choice == -2:
+            choice4 = input("Name for the file: ")
+            os.system(f"{USE_PYTHON} user_game_{choice4}.py")
+        elif choice == -1:
+            choice2 = input("What name will the file be? ")
+            os.system(f"{EDITOR} user_game_{choice2}.py")
+            add_quit_logic(f"user_game_{choice2}.py")
+            choice3 = input("Run game? (y/n): ")
+            if choice3.lower() == "y":
+                os.system(f"{USE_PYTHON} user_game_{choice2}.py")
+        elif choice in games:
             games[choice]()
         else:
             print("Invalid choice. Please try again.")
